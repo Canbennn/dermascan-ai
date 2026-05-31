@@ -1,4 +1,4 @@
-# Luxaura AI — Frontend Templates
+# Dermascan AI — Frontend Templates
 
 > Dark Medical Futuristic / Biopunk Clinical UI  
 > Flask + Jinja2 · Font Awesome 6.5 · VGG16 skin-lesion classifier
