@@ -66,10 +66,6 @@ Les captures d’écran suivantes montrent l’interface principale de la platef
 
 ![Capture d'écran du centre de notifications](screenshots/notifications.png)
 
-### Configuration
-
-![Capture d'écran de la page de configuration](screenshots/settings.png)
-
 ### Assistant médical AI
 
 ![Capture d'écran de l'assistant médical AI](screenshots/assistant.png)
@@ -164,8 +160,6 @@ flask run
 ---
 
 ## 📝 Notes
-
-- **CAPTCHA** is a front-end-only mock (click to toggle). Replace with real reCAPTCHA in production.
 - **AI model stats** (97.4% accuracy) are hard-coded in the HTML for display purposes; wire them to your Flask context for live values.
 - The `style.css` uses `--cyan` mapped to `#ff2d7d` (pink-magenta) — this is intentional per the original design system.
 - All pages are responsive down to ~480px. Sidebar collapses to hidden on small screens.
