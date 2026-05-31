@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>DermaScan AI — Paramètres</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body style="background: var(--bg-void);">
+
+<div class="app-wrapper">
+    <aside class="sidebar">
+        <a href="/dashboard" class="sidebar-logo">
+            <div class="sidebar-logo-icon" style="color: var(--cyan);">✦</div>
+            <span class="sidebar-logo-name">DermaScan AI</span>
+        </a>
+        <a href="/dashboard" class="nav-item"><div class="nav-icon"><i class="fa fa-home"></i></div>Accueil</a>
+        </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Configuration</h1>
+            <p style="color: var(--text-secondary);">Gérez votre compte et vos préférences DermaScan AI.</p>
+        </div>
+
+        <div class="dashboard-card" style="max-width: 600px;">
+            <h3 style="color: var(--cyan); margin-bottom: 20px; font-family: 'Syne';">Compte Utilisateur</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Identifiant</label>
+                <input type="text" class="form-input" value="Nour_Enstab" style="color: #2d2825;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Email Professionnel</label>
+                <input type="email" class="form-input" value="nour@enstab.tn" style="color: #2d2825;">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 30px 0;">
+
+            <h3 style="color: var(--cyan); margin-bottom: 20px; font-family: 'Syne';">Préférences Système</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="color: var(--text-primary);">Notifications Email</span>
+                <input type="checkbox" checked style="accent-color: var(--cyan); width: 20px; height: 20px;">
+            </div>
+
+            <button class="btn-primary" style="margin-top: 20px; width: 100%;">Sauvegarder les modifications</button>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

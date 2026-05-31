@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaScan AI — Centre d'aide</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .help-hero {
+      background: linear-gradient(135deg, rgba(255,45,125,0.06) 0%, rgba(0,212,255,0.04) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .help-hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(255,45,125,0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .help-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 500px;
+      margin: 24px auto 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 4px 4px 4px 16px;
+      transition: border-color 0.25s;
+    }
+
+    .help-search-bar:focus-within { border-color: var(--cyan); }
+
+    .help-search-bar input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: var(--font-body);
+    }
+
+    .help-search-bar input::placeholder { color: var(--text-muted); }
+
+    .search-btn {
+      background: var(--cyan);
+      border: none;
+      border-radius: 8px;
+      color: #050a0f;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .search-btn:hover { opacity: 0.85; }
+
+    /* Category cards */
+    .help-cats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .help-cat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .help-cat:hover {
+      border-color: var(--border-active);
+      transform: translateY(-3px);
+      background: var(--bg-card-hover);
+    }
+
+    .help-cat-icon { font-size: 28px; margin-bottom: 10px; }
+    .help-cat-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .help-cat-count { font-size: 11px; color: var(--text-muted); }
+
+    /* FAQ Accordion */
+    .faq-section { margin-bottom: 32px; }
+
+    .faq-category-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .faq-item.open { border-color: rgba(255,45,125,0.2); }
+
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .faq-question:hover { background: var(--bg-card-hover); }
+
+    .faq-q-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .faq-chevron {
+      color: var(--text-muted);
+      font-size: 12px;
+      transition: transform 0.3s;
+    }
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--cyan);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+      padding: 0 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+
+    .faq-answer.open {
+      max-height: 600px;
+      padding: 0 20px 18px;
+    }
+
+    .faq-answer ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .faq-answer ul li { margin-bottom: 6px; }
+
+    .faq-answer strong { color: var(--cyan); }
+
+    /* Guide cards */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .guide-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .guide-card:hover {
+      border-color: var(--border-active);
+      background: var(--bg-card-hover);
+    }
+
+    .guide-num {
+      width: 32px; height: 32px;
+      background: rgba(255,45,125,0.1);
+      border: 1px solid rgba(255,45,125,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--cyan);
+      margin-bottom: 14px;
+    }
+
+    .guide-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .guide-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Contact CTA */
+    .contact-cta {
+      background: linear-gradient(135deg, rgba(255,45,125,0.06), rgba(0,212,255,0.04));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .contact-cta-icon {
+      font-size: 48px;
+      flex-shrink: 0;
+    }
+
+    .tip-box {
+      background: rgba(0,229,160,0.04);
+      border: 1px solid rgba(0,229,160,0.12);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .tip-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body style="background: var(--bg-void);">
+
+<div class="app-wrapper">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <a href="/dashboard" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🔬</div>
+      <span class="sidebar-logo-name">DermaScan AI</span>
+    </a>
+    <div class="sidebar-section-label">Navigation</div>
+    <a href="/dashboard" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-house"></i></div>Accueil
+    </a>
+    <a href="/predict" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-microscope"></i></div>Nouvelle analyse
+    </a>
+    <a href="/patients" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-user-group"></i></div>Patients
+    </a>
+    <div class="sidebar-section-label">Système</div>
+    <a href="/notifications" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-bell"></i></div>Notifications
+    </a>
+    <a href="/help" class="nav-item active">
+      <div class="nav-icon"><i class="fa fa-circle-question"></i></div>Aide
+    </a>
+    <div style="margin-top:auto; padding-top:24px; border-top:1px solid var(--border);">
+      <a href="/logout" class="nav-item" style="color:#ff6b7a;">
+        <div class="nav-icon" style="background:rgba(255,107,122,0.1); color:#ff6b7a;"><i class="fa fa-right-from-bracket"></i></div>Déconnexion
+      </a>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main-content">
+
+    <!-- Hero -->
+    <div class="help-hero">
+      <div style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--cyan); margin-bottom:12px;">
+        <i class="fa fa-circle-question" style="margin-right:6px;"></i> Centre d'aide
+      </div>
+      <h1 class="page-title" style="margin-bottom:10px;">Comment pouvons-nous vous aider ?</h1>
+      <p style="color:var(--text-secondary); font-size:14px; max-width:420px; margin:0 auto;">
+        Guides d'utilisation, FAQ et support technique — tout ce dont vous avez besoin pour tirer le meilleur de DermaScan AI.
+      </p>
+      <div class="help-search-bar">
+        <i class="fa fa-magnifying-glass" style="color:var(--text-muted);"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher dans l'aide…" oninput="filterFAQ(this.value)">
+        <button class="search-btn">Rechercher</button>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="help-cats">
+      <a href="#getting-started" class="help-cat">
+        <div class="help-cat-icon">🚀</div>
+        <div class="help-cat-title">Démarrage rapide</div>
+        <div class="help-cat-count">4 articles</div>
+      </a>
+      <a href="#analyse" class="help-cat">
+        <div class="help-cat-icon">🔬</div>
+        <div class="help-cat-title">Analyser une image</div>
+        <div class="help-cat-count">5 articles</div>
+      </a>
+      <a href="#resultats" class="help-cat">
+        <div class="help-cat-icon">📊</div>
+        <div class="help-cat-title">Lire les résultats</div>
+        <div class="help-cat-count">3 articles</div>
+      </a>
+      <a href="#patients" class="help-cat">
+        <div class="help-cat-icon">👥</div>
+        <div class="help-cat-title">Gestion patients</div>
+        <div class="help-cat-count">3 articles</div>
+      </a>
+      <a href="#securite" class="help-cat">
+        <div class="help-cat-icon">🔒</div>
+        <div class="help-cat-title">Sécurité & Données</div>
+        <div class="help-cat-count">4 articles</div>
+      </a>
+      <a href="#contact" class="help-cat">
+        <div class="help-cat-icon">💬</div>
+        <div class="help-cat-title">Nous contacter</div>
+        <div class="help-cat-count">Support direct</div>
+      </a>
+    </div>
+
+    <!-- Guide rapide -->
+    <div style="margin-bottom:32px;" id="getting-started">
+      <h2 style="font-family:var(--font-display); font-size:18px; color:var(--text-primary); margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <i class="fa fa-map" style="color:var(--cyan);"></i> Guide en 4 étapes
+      </h2>
+      <div class="guide-grid">
+        <div class="guide-card">
+          <div class="guide-num">1</div>
+          <div class="guide-title">Créez votre compte</div>
+          <div class="guide-desc">Inscrivez-vous avec votre adresse professionnelle. Votre espace médical est créé instantanément.</div>
+        </div>
+        <div class="guide-card">
+          <div class="guide-num">2</div>
+          <div class="guide-title">Téléchargez une image</div>
+          <div class="guide-desc">Glissez-déposez une image dermoscopique (JPG/PNG, min 224×224px). Assurez-vous que la lésion est bien centrée.</div>
+        </div>
+        <div class="guide-card">
+          <div class="guide-num">3</div>
+          <div class="guide-title">Lancez l'analyse IA</div>
+          <div class="guide-desc">Le modèle VGG16 analyse la lésion en moins de 3 secondes. Renseignez le nom et l'âge du patient.</div>
+        </div>
+        <div class="guide-card">
+          <div class="guide-num">4</div>
+          <div class="guide-title">Interprétez le résultat</div>
+          <div class="guide-desc">Consultez le score de probabilité, le diagnostic et les recommandations cliniques personnalisées.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section" id="analyse">
+      <div class="faq-category-title">
+        <i class="fa fa-microscope" style="color:var(--cyan);"></i>
+        Analyse d'images
+      </div>
+      <div id="faqContainer">
+
+        <div class="faq-item" data-tags="image format qualité">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-q-text">Quels formats d'images sont acceptés ?</span>
+            <i class="fa fa-chevron-down faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            DermaScan AI accepte les formats <strong>JPG, JPEG, PNG et WEBP</strong>. 
+            La taille maximale est de <strong>10 Mo</strong> par image. Pour une précision optimale :
+            <ul>
+              <li>Résolution minimale recommandée : <strong>224 × 224 px</strong></li>
+              <li>La lésion doit occuper au moins <strong>60 %</strong> de l'image</li>
+              <li>Fond neutre, bonne luminosité</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="faq-item" data-tags="précision confiance score">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-q-text">Comment interpréter le score de confiance ?</span>
+            <i class="fa fa-chevron-down faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            Le score représente la <strong>probabilité de malignité</strong> selon le modèle VGG16 :
+            <ul>
+              <li><strong style="color:var(--success);">0–40%</strong> → Lésion probablement bénigne, surveillance annuelle</li>
+              <li><strong style="color:var(--warning);">40–70%</strong> → Zone d'attention, consultation recommandée</li>
+              <li><strong style="color:var(--danger);">70–100%</strong> → Haute probabilité de malignité, bilan urgent</li>
+            </ul>
+            Le seuil de décision par défaut est <strong>0.50 (50%)</strong>.
+          </div>
+        </div>
+
+        <div class="faq-item" data-tags="reflet flou mauvais résultat">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-q-text">Mon image donne un mauvais résultat — que faire ?</span>
+            <i class="fa fa-chevron-down faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            Plusieurs facteurs peuvent affecter la précision :
+            <ul>
+              <li>Image floue ou sous-exposée → assurez une bonne netteté</li>
+              <li>Reflets du flash ou du gel dermoscopique → éliminez les artefacts</li>
+              <li>Poils épais masquant la lésion → utilisez si possible une image après épilation</li>
+              <li>Lésion mal centrée → recadrez pour que la lésion soit au centre</li>
+            </ul>
+            Réessayez avec une image de meilleure qualité.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="faq-section" id="resultats">
+      <div class="faq-category-title">
+        <i class="fa fa-chart-bar" style="color:var(--teal);"></i>
+        Résultats & Diagnostics
+      </div>
+
+      <div class="faq-item" data-tags="malin bénin melanome">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="faq-q-text">Que signifie « Malignant » vs « Benign » ?</span>
+          <i class="fa fa-chevron-down faq-chevron"></i>
+        </div>
+        <div class="faq-answer">
+          <ul>
+            <li><strong>Malignant (Malin)</strong> : La lésion présente des caractéristiques compatibles avec une pathologie cancéreuse (mélanome, carcinome). Une consultation urgente est recommandée.</li>
+            <li><strong>Benign (Bénin)</strong> : La lésion présente des caractéristiques non cancéreuses (nævi bénin, kératose séborrhéique). Une surveillance annuelle est conseillée.</li>
+          </ul>
+          <strong>Important :</strong> Ce résultat est une aide au diagnostic. Il ne remplace pas l'évaluation d'un dermatologue.
+        </div>
+      </div>
+
+      <div class="faq-item" data-tags="rapport exporter pdf">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="faq-q-text">Puis-je exporter le rapport d'analyse ?</span>
+          <i class="fa fa-chevron-down faq-chevron"></i>
+        </div>
+        <div class="faq-answer">
+          Depuis la page de résultat, vous pouvez utiliser la fonction <strong>impression du navigateur</strong> (Ctrl+P) pour générer un PDF du rapport complet. Une fonctionnalité d'export PDF natif est en cours de développement et sera disponible prochainement.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="faq-section" id="securite">
+      <div class="faq-category-title">
+        <i class="fa fa-shield-halved" style="color:var(--success);"></i>
+        Sécurité & Confidentialité
+      </div>
+
+      <div class="faq-item" data-tags="données sécurité confidentialité">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="faq-q-text">Où sont stockées les données patients ?</span>
+          <i class="fa fa-chevron-down faq-chevron"></i>
+        </div>
+        <div class="faq-answer">
+          Toutes les données sont stockées sur <strong>votre serveur local</strong> (base MySQL). Aucune donnée patient n'est envoyée à des serveurs externes. Les images sont conservées dans le dossier <code>static/uploads/</code> de votre instance. Pour un déploiement en production, nous recommandons de chiffrer la base de données et d'utiliser HTTPS.
+        </div>
+      </div>
+
+      <div class="faq-item" data-tags="password mot de passe réinitialiser">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="faq-q-text">Comment changer mon mot de passe ?</span>
+          <i class="fa fa-chevron-down faq-chevron"></i>
+        </div>
+        <div class="faq-answer">
+          Utilisez la fonctionnalité <strong>Mot de passe oublié</strong> sur la page de connexion, ou accédez aux <strong>Paramètres → Compte</strong> pour modifier votre mot de passe directement. Votre nouveau mot de passe doit contenir au moins 8 caractères.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tips -->
+    <div style="margin-bottom:32px;" id="patients">
+      <h2 style="font-family:var(--font-display); font-size:18px; color:var(--text-primary); margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <i class="fa fa-lightbulb" style="color:var(--warning);"></i> Conseils pour de meilleurs résultats
+      </h2>
+      <div class="tip-box">
+        <div class="tip-dot"></div>
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Utilisez des images dermoscopiques</div>
+          <div style="font-size:12px; color:var(--text-secondary);">Le modèle est entraîné sur des images dermoscopiques. Les photos de smartphone donnent des résultats moins précis.</div>
+        </div>
+      </div>
+      <div class="tip-box">
+        <div class="tip-dot"></div>
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Renseignez l'âge du patient</div>
+          <div style="font-size:12px; color:var(--text-secondary);">L'âge est stocké avec l'analyse et permet un meilleur suivi longitudinal dans la base patients.</div>
+        </div>
+      </div>
+      <div class="tip-box">
+        <div class="tip-dot"></div>
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Consultez toujours un dermatologue</div>
+          <div style="font-size:12px; color:var(--text-secondary);">Pour tout score supérieur à 50%, une consultation dermatologique est fortement recommandée, même en présence d'un résultat Bénin.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="contact-cta" id="contact">
+      <div class="contact-cta-icon">💬</div>
+      <div style="flex:1;">
+        <h3 style="font-family:var(--font-display); font-size:18px; margin-bottom:8px;">Vous ne trouvez pas votre réponse ?</h3>
+        <p style="color:var(--text-secondary); font-size:13px; margin-bottom:18px;">
+          Notre équipe est disponible pour vous aider. Décrivez votre problème et nous vous répondrons dans les 24h.
+        </p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="mailto:support@dermascan.ai" class="btn-primary" style="text-decoration:none; padding:11px 22px; font-size:13px;">
+            <i class="fa fa-envelope"></i> Envoyer un e-mail
+          </a>
+          <a href="/dashboard" class="btn-outline" style="text-decoration:none;">
+            <i class="fa fa-arrow-left"></i> Retour au tableau de bord
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function toggleFAQ(questionEl) {
+    const item = questionEl.closest('.faq-item');
+    const answer = item.querySelector('.faq-answer');
+    const isOpen = item.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.faq-item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.faq-answer').classList.remove('open');
+    });
+
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.classList.add('open');
+    }
+  }
+
+  function filterFAQ(query) {
+    const q = query.toLowerCase().trim();
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const text = (item.querySelector('.faq-q-text').textContent + ' ' + (item.dataset.tags || '')).toLowerCase();
+      item.style.display = q === '' || text.includes(q) ? '' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>

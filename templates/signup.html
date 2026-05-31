@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaScan AI — Inscription</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+
+  <!-- LEFT -->
+  <div class="auth-brand">
+    <div class="auth-brand-rings">
+      <div class="auth-brand-ring"></div>
+      <div class="auth-brand-ring"></div>
+      <div class="auth-brand-ring"></div>
+    </div>
+    <div class="brand-logo">
+      <div class="brand-icon" style="color: var(--teal);">✦</div>
+      <span class="brand-name">Derm<span style="color: var(--teal);">aScan</span> AI</span>
+    </div>
+    <h1 class="auth-headline">
+      Éclairer<br>votre <span class="hl">santé</span><br>cutanée.
+    </h1>
+    <p class="auth-subtext">
+      Créez votre espace médical sécurisé et commencez à analyser des lésions cutanées avec une précision de classe mondiale.
+    </p>
+    <div class="auth-stats">
+      <div>
+        <div class="auth-stat-num">HIPAA</div>
+        <div class="auth-stat-label">Conforme</div>
+      </div>
+      <div>
+        <div class="auth-stat-num">AES-256</div>
+        <div class="auth-stat-label">Chiffrement</div>
+      </div>
+      <div>
+        <div class="auth-stat-num">24/7</div>
+        <div class="auth-stat-label">Disponible</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+
+      <h2 class="auth-card-title">Créer un compte</h2>
+      <p class="auth-card-sub">
+        Déjà inscrit ? <a href="{{ url_for('login') }}">Connectez-vous →</a>
+      </p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }}">
+            <i class="fa fa-circle-info"></i> {{ msg }}
+          </div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST" id="signupForm">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prénom</label>
+            <i class="fa fa-id-badge input-icon"></i>
+            <input class="form-input" type="text" name="first_name" placeholder="Jean" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom</label>
+            <i class="fa fa-id-badge input-icon"></i>
+            <input class="form-input" type="text" name="last_name" placeholder="Dupont" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Identifiant</label>
+          <i class="fa fa-at input-icon"></i>
+          <input class="form-input" type="text" name="username" id="usernameInput"
+                 placeholder="jean.dupont" minlength="3" autocomplete="username" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Adresse e-mail</label>
+          <i class="fa fa-envelope input-icon"></i>
+          <input class="form-input" type="email" name="email" placeholder="jean@clinique.fr" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Profession</label>
+          <select class="form-select" name="role" id="roleSelect" onchange="handleRole()">
+            <option value="Médecin dermatologue">Médecin dermatologue</option>
+            <option value="Médecin généraliste">Médecin généraliste</option>
+            <option value="Oncologue">Oncologue</option>
+            <option value="Infirmier(e)">Infirmier(e)</option>
+            <option value="Technicien médical">Technicien médical</option>
+            <option value="Chercheur">Chercheur</option>
+            <option value="autre">Autre…</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="roleCustomGroup" style="display:none;">
+          <label class="form-label">Précisez votre profession</label>
+          <i class="fa fa-briefcase input-icon"></i>
+          <input class="form-input" type="text" name="role_custom" placeholder="Ex: Dermatologue pédiatrique">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <i class="fa fa-lock input-icon"></i>
+          <input class="form-input" type="password" name="password" id="pwdInput"
+                 placeholder="Minimum 8 caractères" minlength="8"
+                 autocomplete="new-password" oninput="checkStrength(this.value)" required>
+          <button type="button" class="input-toggle" onclick="togglePwd('pwdInput', this)">
+            <i class="fa fa-eye"></i>
+          </button>
+          <div class="pwd-strength" id="pwdBars">
+            <div class="pwd-bar" id="bar1"></div>
+            <div class="pwd-bar" id="bar2"></div>
+            <div class="pwd-bar" id="bar3"></div>
+            <div class="pwd-bar" id="bar4"></div>
+          </div>
+          <div class="pwd-label" id="pwdLabel">Entrez un mot de passe</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmer le mot de passe</label>
+          <i class="fa fa-shield input-icon"></i>
+          <input class="form-input" type="password" name="confirm_password" id="confirmPwd"
+                 placeholder="••••••••" autocomplete="new-password" required>
+          <button type="button" class="input-toggle" onclick="togglePwd('confirmPwd', this)">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
+
+        <!-- CAPTCHA -->
+        <div class="captcha-box" id="captchaBox" onclick="toggleCaptcha()">
+          <div class="captcha-checkbox" id="captchaCheck">
+            <i class="fa fa-check" style="font-size:11px; display:none;" id="captchaIcon"></i>
+          </div>
+          <span class="captcha-text">Je ne suis pas un robot</span>
+          <div class="captcha-logo">
+            <strong>reCAPTCHA</strong>
+            <span>Confidentialité – Conditions</span>
+          </div>
+        </div>
+        <input type="hidden" name="captcha_done" id="captchaDone" value="0">
+
+        <div class="form-check" style="margin-bottom:20px;">
+          <input type="checkbox" name="terms" id="termsCheck" required>
+          <label for="termsCheck">
+            J'accepte les <a href="#" class="form-link">Conditions d'utilisation</a> et la
+            <a href="#" class="form-link">Politique de confidentialité</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <i class="fa fa-user-plus" style="margin-right:8px;"></i>
+          Créer mon compte
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    icon.className = inp.type === 'password' ? 'fa fa-eye' : 'fa fa-eye-slash';
+  }
+
+  function handleRole() {
+    const v = document.getElementById('roleSelect').value;
+    document.getElementById('roleCustomGroup').style.display = v === 'autre' ? 'block' : 'none';
+  }
+
+  function checkStrength(val) {
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const bars = ['bar1','bar2','bar3','bar4'];
+    const labels = ['', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+    const cls = ['', 'active-weak', 'active-medium', 'active-strong', 'active-strong'];
+
+    bars.forEach((id, i) => {
+      const bar = document.getElementById(id);
+      bar.className = 'pwd-bar' + (i < score ? ' ' + cls[score] : '');
+    });
+    document.getElementById('pwdLabel').textContent = val.length ? labels[score] || 'Très fort' : 'Entrez un mot de passe';
+  }
+
+  let captchaOk = false;
+  function toggleCaptcha() {
+    captchaOk = !captchaOk;
+    document.getElementById('captchaBox').classList.toggle('checked', captchaOk);
+    document.getElementById('captchaIcon').style.display = captchaOk ? 'block' : 'none';
+    document.getElementById('captchaDone').value = captchaOk ? '1' : '0';
+  }
+
+  document.getElementById('signupForm').addEventListener('submit', function(e) {
+    if (!captchaOk) {
+      e.preventDefault();
+      const box = document.getElementById('captchaBox');
+      box.style.borderColor = 'var(--danger)';
+      setTimeout(() => box.style.borderColor = '', 2000);
+    }
+  });
+</script>
+</body>
+</html>

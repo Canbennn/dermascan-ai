@@ -1,0 +1,8 @@
+*.h5
+model/
+static/uploads/
+__pycache__/
+.env
+echo "model/" > .gitignore
+echo "*.h5" >> .gitignore
+echo "static/uploads/" >> .gitignore

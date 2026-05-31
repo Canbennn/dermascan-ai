@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaScan AI — Liste des Patients</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <aside class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-logo">
+      <div class="sidebar-logo-icon" style="color: var(--teal);">✦</div>
+      <span class="sidebar-logo-name">Derm<span style="color: var(--teal);">aScan</span></span>
+    </a>
+    <div class="sidebar-section-label">Principal</div>
+    <a href="{{ url_for('dashboard') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-gauge-high"></i></div>Tableau de bord
+    </a>
+    <a href="{{ url_for('predict') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-microscope"></i></div>Nouvelle analyse
+    </a>
+    <a href="{{ url_for('patients') }}" class="nav-item active">
+      <div class="nav-icon"><i class="fa fa-user-group"></i></div>Patients
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Base de données patients</h1>
+      <p style="color: var(--text-secondary);">Historique des analyses et suivis dermatologiques.</p>
+    </div>
+
+    <div class="dashboard-card" style="padding: 0; overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="background: var(--bg-surface); color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">
+            <th style="padding: 20px;">Patient</th>
+            <th style="padding: 20px;">Âge</th>
+            <th style="padding: 20px;">Diagnostic</th>
+            <th style="padding: 20px;">Confiance IA</th>
+            <th style="padding: 20px;">Aperçu</th>
+          </tr>
+        </thead>
+        <tbody style="color: var(--text-primary);">
+          {% for p in patients %}
+          <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;" onmouseover="this.style.background='var(--bg-void)'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 16px 20px; font-weight: 600;">{{ p.name }}</td>
+            <td style="padding: 16px 20px;">{{ p.age }} ans</td>
+            <td style="padding: 16px 20px;">
+              <span style="padding: 4px 10px; border-radius: 20px; font-size: 12px; background: rgba(109, 179, 148, 0.1); color: var(--teal); border: 1px solid var(--teal);">
+                {{ p.result }}
+              </span>
+            </td>
+            <td style="padding: 16px 20px; font-family: monospace; font-weight: bold; color: var(--cyan);">
+              {{ (p.probability * 100) | round(2) }}%
+            </td>
+            <td style="padding: 16px 20px;">
+              <img src="{{ p.image_path }}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border);">
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      {% if not patients %}
+      <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+        <i class="fa fa-folder-open" style="font-size: 30px; margin-bottom: 10px; display: block;"></i>
+        Aucun patient enregistré pour le moment.
+      </div>
+      {% endif %}
+    </div>
+
+    <div style="margin-top: 24px;">
+      <a href="{{ url_for('dashboard') }}" class="btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fa fa-arrow-left"></i> Retour au Dashboard
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

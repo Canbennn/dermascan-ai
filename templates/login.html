@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaScan AI — Connexion</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .login-wrapper {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 480px 1fr;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* ─── LEFT PANEL ─── */
+    .login-left {
+      background: linear-gradient(160deg, #03070d 0%, #06101a 60%, #050d17 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 50px;
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid rgba(255,45,125,0.06);
+    }
+
+    .login-left::before {
+      content: '';
+      position: absolute;
+      bottom: -200px; left: -100px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,45,125,0.05) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .medical-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,45,125,0.08);
+      border: 1px solid rgba(255,45,125,0.2);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .medical-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .left-headline {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      color: var(--text-primary);
+      margin-bottom: 18px;
+    }
+
+    .left-headline .accent { color: var(--cyan); }
+
+    .left-subtext {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      margin-bottom: 40px;
+      max-width: 320px;
+    }
+
+    .medical-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .mstat-card {
+      background: rgba(13,21,32,0.8);
+      border: 1px solid rgba(255,45,125,0.08);
+      border-radius: 14px;
+      padding: 18px 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .mstat-card:hover { border-color: rgba(255,45,125,0.2); }
+
+    .mstat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .mstat-card:hover::before { opacity: 1; }
+
+    .mstat-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .mstat-num {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .mstat-num span {
+      font-size: 14px;
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .mstat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .hope-quote {
+      background: rgba(255,45,125,0.04);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    .hope-quote strong { color: var(--cyan); font-style: normal; }
+
+    /* ─── CENTER PANEL ─── */
+    .login-center {
+      background: var(--bg-deep);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 44px;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,45,125,0.06);
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .login-logo-icon {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, var(--cyan), #a020f0);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 24px rgba(255,45,125,0.3);
+    }
+
+    .login-logo-name {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .login-logo-name span { color: var(--cyan); }
+
+    .login-form-wrap {
+      width: 100%;
+    }
+
+    .login-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .login-subtitle a {
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .login-security-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 24px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .login-security-note i { color: var(--success); font-size: 10px; }
+
+    /* ─── RIGHT PANEL ─── */
+    .login-right {
+      background: linear-gradient(160deg, #030a12 0%, #05101c 60%, #040d18 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 50px;
+      position: relative;
+      overflow: hidden;
+      border-left: 1px solid rgba(0,212,255,0.06);
+    }
+
+    .login-right::before {
+      content: '';
+      position: absolute;
+      top: -150px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .right-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--teal);
+      margin-bottom: 20px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feature-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .feature-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .feature-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .testimonial-card {
+      background: rgba(13,21,32,0.7);
+      border: 1px solid rgba(0,212,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: 10px; right: 16px;
+      font-family: Georgia, serif;
+      font-size: 48px;
+      color: rgba(0,212,255,0.1);
+      line-height: 1;
+    }
+
+    .testimonial-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 14px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .testimonial-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05));
+      border: 1px solid rgba(0,212,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal);
+      font-family: var(--font-display);
+    }
+
+    .testimonial-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .testimonial-role {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .ai-accuracy-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,229,160,0.04);
+      border: 1px solid rgba(0,229,160,0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .accuracy-circle {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      border: 3px solid var(--success);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .accuracy-num {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--success);
+    }
+
+    .accuracy-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .accuracy-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ─── Floating rings animation ─── */
+    .bg-rings {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,45,125,0.04);
+      animation: ringFloat 12s ease-in-out infinite;
+    }
+
+    @keyframes ringFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+      50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.8; }
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .login-wrapper { grid-template-columns: 1fr 440px; }
+      .login-left { display: none; }
+    }
+    @media (max-width: 700px) {
+      .login-wrapper { grid-template-columns: 1fr; }
+      .login-right { display: none; }
+      .login-center { padding: 40px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+  <!-- ══ LEFT: Medical Context ══ -->
+  <div class="login-left">
+    <div class="bg-rings">
+      <div class="bg-ring" style="width:400px;height:400px;top:30%;left:50%;animation-delay:0s;"></div>
+      <div class="bg-ring" style="width:600px;height:600px;top:60%;left:30%;animation-delay:3s;"></div>
+    </div>
+
+    <div style="position:relative; z-index:1;">
+      <div class="medical-badge">
+        <i class="fa fa-heart-pulse"></i> Dermatologie IA
+      </div>
+
+      <h1 class="left-headline">
+        Chaque lésion<br>détectée tôt<br>est une vie<br><span class="accent">sauvée.</span>
+      </h1>
+
+      <p class="left-subtext">
+        Le mélanome est le cancer de la peau le plus dangereux — mais détecté à stade précoce,
+        le taux de survie à 5 ans dépasse <strong style="color:var(--cyan);">98 %</strong>.
+        DermaScan AI met la puissance du deep learning au service de votre diagnostic.
+      </p>
+
+      <div class="medical-stats-grid">
+        <div class="mstat-card">
+          <div class="mstat-icon">🩺</div>
+          <div class="mstat-num">97.3<span>%</span></div>
+          <div class="mstat-label">Précision VGG16</div>
+        </div>
+        <div class="mstat-card">
+          <div class="mstat-icon">⚡</div>
+          <div class="mstat-num">3<span>s</span></div>
+          <div class="mstat-label">Temps d'analyse</div>
+        </div>
+        <div class="mstat-card">
+          <div class="mstat-icon">🔬</div>
+          <div class="mstat-num">10K<span>+</span></div>
+          <div class="mstat-label">Images entraînées</div>
+        </div>
+        <div class="mstat-card">
+          <div class="mstat-icon">🌍</div>
+          <div class="mstat-num">98<span>%</span></div>
+          <div class="mstat-label">Survie si détecté tôt</div>
+        </div>
+      </div>
+
+      <div class="hope-quote">
+        « L'intelligence artificielle ne remplace pas le médecin —
+        elle lui donne des <strong>superpouvoirs diagnostiques</strong>.
+        Ensemble, nous pouvons détecter ce que l'œil seul ne voit pas. »
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CENTER: Login Form ══ -->
+  <div class="login-center">
+    <div class="login-logo">
+      <div class="login-logo-icon">🔬</div>
+      <div class="login-logo-name">DermaScan AI</div>
+    </div>
+
+    <div class="login-form-wrap">
+      <h2 class="login-title">Bon retour 👋</h2>
+      <p class="login-subtitle">
+        Pas encore de compte ?
+        <a href="{{ url_for('signup') }}">Créez-en un →</a>
+      </p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }}" style="margin-bottom:16px;">
+            <i class="fa fa-circle-info"></i> {{ msg }}
+          </div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+
+        <div class="form-group">
+          <label class="form-label">Identifiant</label>
+          <i class="fa fa-user input-icon"></i>
+          <input class="form-input" type="text" name="username"
+                 placeholder="jean.dupont" autocomplete="username" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <i class="fa fa-lock input-icon"></i>
+          <input class="form-input" type="password" name="password" id="pwdInput"
+                 placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" class="input-toggle" onclick="togglePwd()">
+            <i class="fa fa-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--text-secondary);">
+            <input type="checkbox" name="remember" style="accent-color:var(--cyan); width:14px; height:14px;">
+            Se souvenir de moi
+          </label>
+          <a href="{{ url_for('forgot_password') }}"
+             style="font-size:12px; color:var(--cyan); text-decoration:none; font-weight:500;">
+            Mot de passe oublié ?
+          </a>
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn">
+          <i class="fa fa-right-to-bracket" style="margin-right:8px;"></i>
+          Se connecter
+        </button>
+
+      </form>
+
+      <div class="login-divider">ou</div>
+
+      <a href="{{ url_for('signup') }}"
+         style="display:flex; align-items:center; justify-content:center; gap:8px;
+                padding:12px 20px; background:rgba(255,45,125,0.05);
+                border:1px solid rgba(255,45,125,0.15); border-radius:var(--radius-md);
+                color:var(--text-secondary); font-size:13px; text-decoration:none;
+                transition:all 0.25s;"
+         onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--text-primary)'"
+         onmouseout="this.style.borderColor='rgba(255,45,125,0.15)';this.style.color='var(--text-secondary)'">
+        <i class="fa fa-user-plus" style="color:var(--cyan);"></i>
+        Créer un nouveau compte médecin
+      </a>
+
+      <div class="login-security-note">
+        <i class="fa fa-shield-halved"></i>
+        Connexion chiffrée · Données médicales protégées · HIPAA
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT: Features & Testimonials ══ -->
+  <div class="login-right">
+    <div class="bg-rings">
+      <div class="bg-ring" style="width:350px;height:350px;top:20%;left:60%;animation-delay:1.5s;border-color:rgba(0,212,255,0.04);"></div>
+    </div>
+
+    <div style="position:relative; z-index:1;">
+
+      <div class="right-section-label">
+        <i class="fa fa-star" style="margin-right:6px;"></i>
+        Fonctionnalités clés
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon" style="background:rgba(255,45,125,0.1); color:var(--cyan);">
+            <i class="fa fa-brain"></i>
+          </div>
+          <div>
+            <div class="feature-title">Deep Learning VGG16</div>
+            <div class="feature-desc">Réseau de neurones convolutif fine-tuné sur des milliers d'images dermoscopiques cliniques.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:rgba(0,212,255,0.08); color:var(--teal);">
+            <i class="fa fa-clock"></i>
+          </div>
+          <div>
+            <div class="feature-title">Résultats en 3 secondes</div>
+            <div class="feature-desc">Analyse instantanée avec score de probabilité, seuil de décision et recommandation clinique.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:rgba(0,229,160,0.08); color:var(--success);">
+            <i class="fa fa-database"></i>
+          </div>
+          <div>
+            <div class="feature-title">Historique patients</div>
+            <div class="feature-desc">Base de données sécurisée, suivi longitudinal et export des rapports diagnostiques.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:rgba(255,181,71,0.08); color:var(--warning);">
+            <i class="fa fa-robot"></i>
+          </div>
+          <div>
+            <div class="feature-title">Assistant IA intégré</div>
+            <div class="feature-desc">Posez vos questions cliniques directement à l'assistant médical propulsé par IA générative.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <p class="testimonial-text">
+          « DermaScan AI a transformé ma pratique quotidienne. Je peux maintenant trier les cas urgents
+          en quelques secondes et concentrer mon attention sur les patients qui en ont le plus besoin. »
+        </p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">DR</div>
+          <div>
+            <div class="testimonial-name">Dr. Rania Mansouri</div>
+            <div class="testimonial-role">Dermatologue, Clinique Pasteur Tunis</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-accuracy-strip">
+        <div class="accuracy-circle">
+          <div class="accuracy-num">97%</div>
+        </div>
+        <div>
+          <div class="accuracy-label">Précision clinique validée</div>
+          <div class="accuracy-sub">Testé sur 2 000+ cas réels · Mélanome & Kératose</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePwd() {
+    const inp = document.getElementById('pwdInput');
+    const icon = document.getElementById('eyeIcon');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    icon.className = inp.type === 'password' ? 'fa fa-eye' : 'fa fa-eye-slash';
+  }
+
+  // Animate login button on submit
+  document.getElementById('loginForm').addEventListener('submit', function() {
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;vertical-align:middle;"></span> Connexion…';
+    btn.disabled = true;
+  });
+</script>
+
+</body>
+</html>

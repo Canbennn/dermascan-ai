@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>DermaScan AI — Notifications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body style="background: var(--bg-void);">
+
+<div class="app-wrapper">
+    <aside class="sidebar">
+        <a href="/dashboard" class="sidebar-logo">
+            <div class="sidebar-logo-icon" style="color: var(--cyan);">✦</div>
+            <span class="sidebar-logo-name">DermaScan AI</span>
+        </a>
+        <div class="sidebar-section-label">Menu</div>
+        <a href="/dashboard" class="nav-item"><div class="nav-icon"><i class="fa fa-home"></i></div>Accueil</a>
+        <a href="/notifications" class="nav-item active"><div class="nav-icon"><i class="fa fa-bell"></i></div>Notifications</a>
+        </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Centre de Notifications</h1>
+            <p style="color: var(--text-secondary);">Restez informé de vos analyses et mises à jour.</p>
+        </div>
+
+        <div class="dashboard-card" style="padding: 0;">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: start; gap: 15px; background: rgba(128, 0, 32, 0.03);">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--cyan); margin-top: 6px;"></div>
+                <div style="flex: 1;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 4px;">Analyse terminée — Patient #4290</h4>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Le rapport de détection pour "Mélanome potentiel" est prêt à être consulté.</p>
+                    <span style="font-size: 11px; color: var(--cyan); font-weight: 700;">Il y a 10 minutes</span>
+                </div>
+            </div>
+
+            <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: start; gap: 15px; opacity: 0.7;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: transparent; border: 1px solid var(--border); margin-top: 6px;"></div>
+                <div style="flex: 1;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 4px;">Mise à jour système v2.1</h4>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Le modèle DermaScan AI a été optimisé pour les images à basse luminosité.</p>
+                    <span style="font-size: 11px; color: var(--text-muted);">Hier à 14:30</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

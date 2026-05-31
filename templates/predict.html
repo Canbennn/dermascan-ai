@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaScan AI — Nouvelle analyse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-logo">
+      <div class="sidebar-logo-icon" style="color: var(--teal);">✦</div>
+      <span class="sidebar-logo-name">Derm<span style="color: var(--teal);">aScan</span></span>
+    </a>
+    <div class="sidebar-section-label">Principal</div>
+    <a href="{{ url_for('dashboard') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-gauge-high"></i></div>Tableau de bord
+    </a>
+    <a href="{{ url_for('predict') }}" class="nav-item active">
+      <div class="nav-icon"><i class="fa fa-microscope"></i></div>Nouvelle analyse
+    </a>
+    <a href="{{ url_for('patients') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-users"></i></div>Patients
+    </a>
+    <div class="sidebar-section-label">Outils</div>
+    <a href="{{ url_for('notifications_page') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-bell"></i></div>Notifications
+    </a>
+    </a>
+    <a href="{{ url_for('help_page') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-circle-question"></i></div>Aide
+    </a>
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar">{{ session['user'][0] | upper }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ session['user'] }}</div>
+          <div class="user-role">{{ session.get('role', 'Médecin') }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" style="color:var(--text-muted);font-size:14px;text-decoration:none;"
+           onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+          <i class="fa fa-arrow-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Nouvelle analyse</div>
+    <div class="topbar-actions">
+      <a href="{{ url_for('patients') }}" class="btn-outline">
+        <i class="fa fa-users"></i> Mes patients
+      </a>
+      <a href="{{ url_for('dashboard') }}" class="icon-btn">
+        <i class="fa fa-house"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <div class="page-header fade-up">
+      <h1>Analyse dermoscopique <span style="color:var(--cyan);">IA</span></h1>
+      <p>Chargez une image de lésion cutanée — le modèle VGG16 rend son diagnostic en moins de 3 secondes.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} fade-up">
+          <i class="fa fa-circle-info"></i> {{ msg }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <div style="display:grid; grid-template-columns:1fr 380px; gap:20px; align-items:start;">
+
+      <!-- LEFT: form -->
+      <div>
+        <form method="POST" enctype="multipart/form-data" id="analyzeForm">
+
+          <!-- Patient info -->
+          <div class="upload-card fade-up">
+            <div style="font-family:var(--font-display); font-size:15px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+              <i class="fa fa-user-doctor" style="color:var(--cyan);"></i>
+              Informations patient
+            </div>
+            <div class="predict-fields">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Nom complet</label>
+                <i class="fa fa-user input-icon"></i>
+                <input class="form-input" type="text" name="name" placeholder="Prénom Nom" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Âge</label>
+                <i class="fa fa-calendar input-icon"></i>
+                <input class="form-input" type="number" name="age" placeholder="Ex: 42" min="0" max="130" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image upload -->
+          <div class="upload-card fade-up">
+            <div style="font-family:var(--font-display); font-size:15px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+              <i class="fa fa-image" style="color:var(--cyan);"></i>
+              Image dermoscopique
+            </div>
+
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" name="image" id="imageInput" accept="image/*" required onchange="handleFile(this)">
+              <div id="uploadPlaceholder">
+                <div class="upload-icon">🩻</div>
+                <div class="upload-text">Glissez-déposez votre image ici</div>
+                <div class="upload-sub">ou cliquez pour parcourir — JPG, PNG, WEBP · Max 10 Mo</div>
+              </div>
+              <div class="upload-preview" id="uploadPreview">
+                <div class="scan-overlay" id="scanOverlay">
+                  <div class="scan-line"></div>
+                </div>
+                <img id="previewImg" src="" alt="Aperçu">
+                <div style="font-size:13px; color:var(--text-secondary);" id="previewName"></div>
+                <button type="button" onclick="clearFile()" class="btn-outline" style="margin-top:4px;">
+                  <i class="fa fa-xmark"></i> Changer
+                </button>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:20px; align-items:center;">
+              <button type="submit" class="btn-analyze" id="analyzeBtn">
+                <i class="fa fa-brain"></i>
+                Lancer l'analyse IA
+              </button>
+              <a href="{{ url_for('dashboard') }}" class="btn-outline">Annuler</a>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- RIGHT: tips card -->
+      <div>
+        <div class="card fade-up" style="position:sticky; top:calc(var(--topbar-h) + 20px);">
+          <div class="card-header">
+            <span class="card-title">
+              <i class="fa fa-lightbulb" style="color:var(--warning); margin-right:8px;"></i>
+              Guide image
+            </span>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:12px;">
+              <div style="width:32px;height:32px;background:rgba(0,229,160,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--success);font-size:14px;flex-shrink:0;">
+                <i class="fa fa-check"></i>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:500; margin-bottom:2px;">Image nette, bien éclairée</div>
+                <div style="font-size:12px; color:var(--text-muted);">Bonne résolution, pas de flou ni d'ombre parasite</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:12px;">
+              <div style="width:32px;height:32px;background:rgba(0,229,160,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--success);font-size:14px;flex-shrink:0;">
+                <i class="fa fa-check"></i>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:500; margin-bottom:2px;">Lésion centrée</div>
+                <div style="font-size:12px; color:var(--text-muted);">La lésion doit occuper la majeure partie de l'image</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:12px;">
+              <div style="width:32px;height:32px;background:rgba(0,229,160,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--success);font-size:14px;flex-shrink:0;">
+                <i class="fa fa-check"></i>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:500; margin-bottom:2px;">Format JPG ou PNG</div>
+                <div style="font-size:12px; color:var(--text-muted);">Taille recommandée ≥ 224×224 px</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <div style="width:32px;height:32px;background:var(--danger-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--danger);font-size:14px;flex-shrink:0;">
+                <i class="fa fa-xmark"></i>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:500; margin-bottom:2px;">Évitez les reflets</div>
+                <div style="font-size:12px; color:var(--text-muted);">Flash direct, gel ou poils épais peuvent affecter la précision</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:14px; background:var(--bg-surface); border-radius:var(--radius-sm); border:1px solid var(--border); font-size:12px; color:var(--text-secondary); line-height:1.6;">
+            <strong style="color:var(--warning);">⚠ Avertissement clinique :</strong>
+            Ce système est un outil d'aide au diagnostic. Il ne remplace pas l'évaluation d'un dermatologue qualifié.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" style="display:none; position:fixed; inset:0; background:rgba(5,10,15,0.85); z-index:1000; flex-direction:column; align-items:center; justify-content:center; backdrop-filter:blur(8px);">
+  <div style="text-align:center;">
+    <div style="font-size:64px; margin-bottom:20px;">🔬</div>
+    <div style="font-family:var(--font-display); font-size:22px; font-weight:700; margin-bottom:8px;">Analyse en cours…</div>
+    <div style="color:var(--text-secondary); font-size:14px; margin-bottom:30px;">Le modèle VGG16 examine la lésion cutanée</div>
+    <div class="spinner" style="width:36px; height:36px; border-width:3px; margin:0 auto;"></div>
+    <div style="margin-top:20px; font-size:12px; color:var(--text-muted);" id="loadingStep">Chargement du modèle…</div>
+  </div>
+</div>
+
+<script>
+  // Drag & drop
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) { document.getElementById('imageInput').files = e.dataTransfer.files; handleFile({ files: [f] }); }
+  });
+
+  function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('previewImg').src = e.target.result;
+      document.getElementById('previewName').textContent = file.name + ' — ' + (file.size / 1024).toFixed(1) + ' Ko';
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('uploadPreview').classList.add('show');
+      // Scan animation
+      const overlay = document.getElementById('scanOverlay');
+      overlay.classList.add('active');
+      setTimeout(() => overlay.classList.remove('active'), 3000);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearFile() {
+    document.getElementById('imageInput').value = '';
+    document.getElementById('uploadPlaceholder').style.display = 'block';
+    document.getElementById('uploadPreview').classList.remove('show');
+    document.getElementById('scanOverlay').classList.remove('active');
+  }
+
+  // Loading overlay
+  const steps = [
+    'Chargement du modèle…',
+    'Prétraitement de l\'image (224×224)…',
+    'Propagation dans VGG16…',
+    'Calcul de la probabilité…',
+    'Finalisation du diagnostic…'
+  ];
+  document.getElementById('analyzeForm').addEventListener('submit', function() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    let i = 0;
+    const stepEl = document.getElementById('loadingStep');
+    setInterval(() => {
+      i = (i + 1) % steps.length;
+      stepEl.textContent = steps[i];
+    }, 900);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaScan AI — Résultat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-logo">
+      <div class="sidebar-logo-icon" style="color: var(--teal);">✦</div>
+      <span class="sidebar-logo-name">Derm<span style="color: var(--teal);">aScan</span></span>
+    </a>
+    <div class="sidebar-section-label">Principal</div>
+    <a href="{{ url_for('dashboard') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-gauge-high"></i></div>Tableau de bord
+    </a>
+    <a href="{{ url_for('predict') }}" class="nav-item active">
+      <div class="nav-icon"><i class="fa fa-microscope"></i></div>Nouvelle analyse
+    </a>
+    <a href="{{ url_for('patients') }}" class="nav-item">
+      <div class="nav-icon"><i class="fa fa-users"></i></div>Patients
+    </a>
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar">{{ session['user'][0] | upper }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ session['user'] }}</div>
+          <div class="user-role">{{ session.get('role', 'Médecin') }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" style="color:var(--text-muted);font-size:14px;text-decoration:none;"
+           onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+          <i class="fa fa-arrow-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Résultat d'analyse</div>
+    <div class="topbar-actions">
+      <a href="{{ url_for('predict') }}" class="btn-analyze" style="height:38px; padding:0 18px; font-size:13px; border-radius:10px;">
+        <i class="fa fa-plus"></i> Nouvelle analyse
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <div style="display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start;">
+
+      <!-- LEFT -->
+      <div>
+
+        <!-- Result hero card -->
+        <div class="card fade-up" style="padding:40px; text-align:center; margin-bottom:20px; position:relative; overflow:hidden;">
+
+          {% set is_malignant = (result == 'Malignant') %}
+
+          <!-- Background glow -->
+          <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, {% if is_malignant %}rgba(255,69,96,0.06){% else %}rgba(0,229,160,0.05){% endif %}, transparent 70%); pointer-events:none;"></div>
+
+          <!-- Gauge -->
+          <div class="result-gauge {% if is_malignant %}malignant{% else %}benign{% endif %}" id="resultGauge">
+            <div class="result-icon">{% if is_malignant %}⚠️{% else %}✅{% endif %}</div>
+            <div class="result-label">{% if is_malignant %}Malin{% else %}Bénin{% endif %}</div>
+          </div>
+
+          <div class="result-prob {% if is_malignant %}text-danger{% else %}text-success{% endif %}">
+            {{ prob }}%
+          </div>
+
+          <div style="font-size:16px; color:var(--text-secondary); margin-bottom:8px;">
+            de probabilité de malignité
+          </div>
+
+          <div style="font-family:var(--font-display); font-size:22px; font-weight:700; letter-spacing:-0.5px; margin-bottom:20px;">
+            Diagnostic IA :
+            <span style="color:{% if is_malignant %}var(--danger){% else %}var(--success){% endif %};">
+              {% if is_malignant %}Lésion maligne{% else %}Lésion bénigne{% endif %}
+            </span>
+          </div>
+
+          <!-- Risk level bar -->
+          <div style="max-width:360px; margin:0 auto 24px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.8px;">
+              <span>Risque faible</span><span>Risque élevé</span>
+            </div>
+            <div style="height:10px; background:linear-gradient(90deg, var(--success), var(--warning), var(--danger)); border-radius:99px; position:relative;">
+              <div id="riskIndicator" style="position:absolute; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; background:white; border-radius:50%; border:3px solid var(--bg-void); box-shadow:0 0 10px rgba(0,0,0,0.5); left:0%; transition:left 1.5s ease-out;"></div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <a href="{{ url_for('patients') }}" class="btn-outline">
+              <i class="fa fa-users"></i> Voir tous les patients
+            </a>
+            <a href="{{ url_for('predict') }}" class="btn-analyze" style="height:auto; padding:10px 20px; font-size:13px;">
+              <i class="fa fa-plus"></i> Nouvelle analyse
+            </a>
+          </div>
+        </div>
+
+        <!-- Clinical interpretation -->
+        <div class="card fade-up">
+          <div class="card-header">
+            <span class="card-title">
+              <i class="fa fa-stethoscope" style="color:var(--cyan); margin-right:8px;"></i>
+              Interprétation clinique
+            </span>
+          </div>
+
+          {% if is_malignant %}
+          <div class="alert alert-danger" style="margin-bottom:16px;">
+            <i class="fa fa-triangle-exclamation"></i>
+            <strong>Attention :</strong> La lésion présente des caractéristiques compatibles avec une pathologie maligne. Une consultation dermatologique urgente est recommandée.
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div style="padding:16px; background:var(--bg-surface); border-radius:var(--radius-md); border:1px solid var(--border);">
+              <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">Recommandation</div>
+              <div style="font-size:13px; line-height:1.6;">Biopsie cutanée et analyse anatomopathologique dans les meilleurs délais.</div>
+            </div>
+            <div style="padding:16px; background:var(--bg-surface); border-radius:var(--radius-md); border:1px solid var(--border);">
+              <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">Urgence</div>
+              <div style="font-size:13px; color:var(--danger); font-weight:600;">🔴 Haute priorité</div>
+            </div>
+          </div>
+
+          {% else %}
+          <div class="alert alert-success" style="margin-bottom:16px;">
+            <i class="fa fa-circle-check"></i>
+            <strong>Résultat rassurant :</strong> La lésion présente des caractéristiques bénignes. Une surveillance périodique est toutefois conseillée.
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div style="padding:16px; background:var(--bg-surface); border-radius:var(--radius-md); border:1px solid var(--border);">
+              <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">Recommandation</div>
+              <div style="font-size:13px; line-height:1.6;">Contrôle annuel ou en cas d'évolution de la lésion.</div>
+            </div>
+            <div style="padding:16px; background:var(--bg-surface); border-radius:var(--radius-md); border:1px solid var(--border);">
+              <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">Priorité</div>
+              <div style="font-size:13px; color:var(--success); font-weight:600;">🟢 Faible</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div style="margin-top:16px; padding:14px; background:var(--bg-surface); border-radius:var(--radius-sm); border-left:3px solid var(--warning); font-size:12px; color:var(--text-secondary); line-height:1.6;">
+            <strong style="color:var(--warning);">Avertissement médical :</strong>
+            Ce résultat est généré par une IA à titre indicatif uniquement. Il ne constitue pas un diagnostic médical et ne remplace en aucun cas l'avis d'un professionnel de santé qualifié.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: image + details -->
+      <div>
+        <div class="card fade-up" style="margin-bottom:16px;">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-image" style="color:var(--cyan); margin-right:8px;"></i> Image analysée</span>
+          </div>
+          <img src="{{ img }}" alt="Image lésion"
+               style="width:100%; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:12px;"
+               onerror="this.style.display='none'">
+          <div style="text-align:center; font-size:12px; color:var(--text-muted);">
+            Résolution : 224×224 px (normalisée pour VGG16)
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-chart-pie" style="color:var(--teal); margin-right:8px;"></i> Détails du modèle</span>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12px; color:var(--text-secondary);">Malignant</span>
+              <span style="font-size:12px; font-family:var(--font-display); font-weight:700; color:var(--danger);">{{ prob }}%</span>
+            </div>
+            <div class="ai-accuracy-bar">
+              <div class="ai-accuracy-fill" style="width:{{ prob }}%; background:linear-gradient(90deg,var(--danger),#ff8fa0);"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12px; color:var(--text-secondary);">Bénin</span>
+              <span style="font-size:12px; font-family:var(--font-display); font-weight:700; color:var(--success);">{{ (100 - prob|float) | round(1) }}%</span>
+            </div>
+            <div class="ai-accuracy-bar">
+              <div class="ai-accuracy-fill" style="width:{{ (100 - prob|float) | round(1) }}%; background:linear-gradient(90deg,var(--success),#7fffd4);"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0; border-bottom:1px solid var(--border);">
+              <span style="color:var(--text-muted);">Modèle</span>
+              <span style="font-weight:500;">VGG16 · Fine-tuné</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0; border-bottom:1px solid var(--border);">
+              <span style="color:var(--text-muted);">Précision du modèle</span>
+              <span style="color:var(--success); font-weight:600;">97.4%</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0;">
+              <span style="color:var(--text-muted);">Seuil de décision</span>
+              <span style="font-weight:500;">0.50</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Animate risk indicator
+  window.addEventListener('load', function() {
+    const prob = {{ prob | float }};
+    setTimeout(() => {
+      document.getElementById('riskIndicator').style.left = prob + '%';
+    }, 300);
+
+    // Gauge pulse
+    const gauge = document.getElementById('resultGauge');
+    gauge.style.transform = 'scale(0.8)';
+    gauge.style.opacity = '0';
+    gauge.style.transition = 'all 0.5s ease-out';
+    setTimeout(() => {
+      gauge.style.transform = 'scale(1)';
+      gauge.style.opacity = '1';
+    }, 100);
+  });
+</script>
+
+</body>
+</html>
