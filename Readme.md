@@ -114,7 +114,6 @@ All templates use Jinja2 template syntax and expect the following from Flask:
 | `result.html` | `result` | `session['user']`, `result`, `prob`, `img` |
 | `patients.html` | `patients` | `patients` list of `{name, age, result, probability, image_path}` |
 | `notifications.html` | `notifications_page` | — |
-| `settings.html` | `settings` | — |
 
 ### Minimum Flask app skeleton
 
