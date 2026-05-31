@@ -20,7 +20,6 @@ project/
 │   ├── result.html         ← Diagnosis result with risk gauge
 │   ├── patients.html       ← Patient database table
 │   ├── notifications.html  ← Notification centre
-│   └── settings.html       ← Account & system preferences
 └── README.md
 ```
 
